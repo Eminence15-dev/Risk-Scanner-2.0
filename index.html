@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cybersecurity Risk Scanner</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#ffffff;--bg-s:#f5f5f3;--tp:#1a1a1a;--ts:#6b6b6b;--tt:#9a9a9a;--br:rgba(0,0,0,0.12);--brh:rgba(0,0,0,0.25);--rm:8px;--rl:12px; }
+    @media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg-s:#242424;--tp:#f0f0f0;--ts:#9a9a9a;--tt:#606060;--br:rgba(255,255,255,0.12);--brh:rgba(255,255,255,0.25);}}
+    body{font-family:'Syne',sans-serif;background:var(--bg-s);color:var(--tp);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;}
+    .card{background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rl);padding:2rem 1.75rem;width:100%;max-width:580px;}
+    .lbl{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--tt);margin-bottom:6px;}
+    .title{font-size:26px;font-weight:700;color:var(--tp);margin-bottom:.75rem;line-height:1.2;}
+    .sub{font-size:15px;color:var(--ts);line-height:1.7;margin-bottom:1.5rem;}
+    .pbar{height:3px;background:var(--br);border-radius:2px;margin-bottom:2rem;}
+    .pfill{height:100%;border-radius:2px;background:#378ADD;transition:width .4s ease;}
+    .qctr{font-family:'DM Mono',monospace;font-size:12px;color:var(--tt);margin-bottom:1rem;}
+    .qtxt{font-size:16px;color:var(--tp);line-height:1.6;margin-bottom:1.25rem;}
+    .opt{display:block;width:100%;text-align:left;padding:12px 16px;margin-bottom:8px;border-radius:var(--rm);border:0.5px solid var(--brh);background:var(--bg);cursor:pointer;font-size:14px;color:var(--tp);font-family:'Syne',sans-serif;transition:all .15s;line-height:1.45;}
+    .opt:hover{background:var(--bg-s);}
+    .opt.sel{background:#E6F1FB;border-color:#378ADD;color:#0C447C;}
+    .nav{display:flex;gap:12px;margin-top:1.5rem;}
+    .btnp{flex:1;padding:12px;border:0.5px solid #378ADD;background:transparent;border-radius:var(--rm);color:#378ADD;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;}
+    .btnp:hover{background:#E6F1FB;}
+    .btnp:disabled{opacity:.4;cursor:not-allowed;}
+    .btns{padding:12px 20px;border:0.5px solid var(--brh);background:transparent;border-radius:var(--rm);color:var(--ts);font-family:'Syne',sans-serif;font-size:15px;cursor:pointer;}
+    .btns:hover{background:var(--bg-s);}
+    .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem;}
+    .chip{padding:10px 14px;border-radius:var(--rm);border:0.5px solid var(--brh);background:var(--bg);cursor:pointer;font-size:13px;color:var(--ts);font-family:'Syne',sans-serif;transition:all .15s;text-align:left;}
+    .chip:hover{background:var(--bg-s);}
+    .chip.sel{background:#E6F1FB;border-color:#378ADD;color:#0C447C;}
+    .chip-ic{font-size:18px;display:block;margin-bottom:4px;}
+    .chip-lb{font-size:13px;font-weight:700;display:block;}
+    .chip-sb{font-size:11px;color:var(--tt);display:block;margin-top:2px;font-family:'DM Mono',monospace;}
+    .chip.sel .chip-sb{color:#185FA5;}
+    .spin-wrap{text-align:center;padding:2.5rem 0;}
+    .spinner{width:36px;height:36px;border:2px solid var(--br);border-top-color:#378ADD;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .spin-lbl{font-size:15px;font-weight:700;color:var(--tp);margin-bottom:6px;}
+    .spin-sub{font-size:12px;font-family:'DM Mono',monospace;color:var(--tt);}
+    .sh{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--tt);margin:1.5rem 0 .75rem;padding-bottom:6px;border-bottom:0.5px solid var(--br);}
+    .crow{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+    .cnm{font-size:12px;color:var(--ts);width:140px;flex-shrink:0;font-family:'DM Mono',monospace;}
+    .ctrk{flex:1;height:6px;background:var(--br);border-radius:3px;overflow:hidden;}
+    .cfil{height:100%;border-radius:3px;}
+    .csco{font-size:12px;font-family:'DM Mono',monospace;width:32px;text-align:right;color:var(--ts);}
+    .rec{display:flex;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--br);}
+    .rec-ic{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+    .rec-t{font-weight:500;font-size:13px;margin-bottom:3px;color:var(--tp);}
+    .rec-d{color:var(--ts);font-size:12px;line-height:1.55;}
+    .ring-wrap{text-align:center;margin:.5rem 0 1.5rem;}
+    .badge{display:inline-block;padding:4px 14px;border-radius:99px;font-size:12px;font-family:'DM Mono',monospace;margin-top:8px;}
+    .err{background:#FCEBEB;border:0.5px solid #F09595;border-radius:var(--rm);padding:14px 16px;font-size:13px;color:#501313;line-height:1.6;margin-bottom:1rem;}
+    .tag{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-family:'DM Mono',monospace;margin-right:6px;margin-bottom:6px;}
+    .ai-b{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11px;font-family:'DM Mono',monospace;background:#E6F1FB;color:#185FA5;margin-bottom:1rem;}
+    footer{text-align:center;font-size:11px;font-family:'DM Mono',monospace;color:var(--tt);margin-top:1.5rem;}
+  </style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const RL=[{max:20,label:'Minimal Risk',color:'#1D9E75',bg:'#E1F5EE',tc:'#085041'},{max:40,label:'Low Risk',color:'#639922',bg:'#EAF3DE',tc:'#27500A'},{max:60,label:'Moderate Risk',color:'#BA7517',bg:'#FAEEDA',tc:'#633806'},{max:80,label:'High Risk',color:'#D85A30',bg:'#FAECE7',tc:'#4A1B0C'},{max:100,label:'Critical Risk',color:'#A32D2D',bg:'#FCEBEB',tc:'#501313'}];
+const ROLES=[{id:'general',icon:'🏠',label:'General User',sub:'personal / home use'},{id:'remote_worker',icon:'💼',label:'Remote Worker',sub:'wfh / hybrid role'},{id:'developer',icon:'👨‍💻',label:'Developer',sub:'technical professional'},{id:'executive',icon:'📊',label:'Executive',sub:'high-value target'},{id:'student',icon:'🎓',label:'Student',sub:'education / campus'},{id:'healthcare',icon:'🏥',label:'Healthcare',sub:'sensitive data handler'}];
+const DEVS=[{id:'windows',icon:'🖥️',label:'Windows PC',sub:'desktop / laptop'},{id:'mac',icon:'🍎',label:'Mac / iPhone',sub:'apple ecosystem'},{id:'android',icon:'📱',label:'Android',sub:'mobile first'},{id:'mixed',icon:'🔀',label:'Mixed devices',sub:'multiple platforms'}];
+const SEV={high:{bg:'#FCEBEB',color:'#A32D2D'},medium:{bg:'#FAEEDA',color:'#BA7517'},low:{bg:'#EAF3DE',color:'#3B6D11'}};
+
+let S={step:'intro',role:null,device:null,cats:[],ci:0,qi:0,ans:{},report:null,error:null};
+
+const getRisk=s=>RL.find(r=>s<=r.max)||RL[RL.length-1];
+const totalQ=()=>S.cats.reduce((s,c)=>s+c.questions.length,0);
+const doneQ=()=>S.cats.slice(0,S.ci).reduce((s,c)=>s+c.questions.length,0)+S.qi;
+function scores(){
+  const cs={};
+  S.cats.forEach(c=>{const a=S.ans[c.id]||[];cs[c.id]=a.length?Math.round(a.reduce((s,v)=>s+v,0)/a.length):50;});
+  return{cs,overall:Math.round(Object.values(cs).reduce((s,v)=>s+v,0)/S.cats.length)};
+}
+
+async function genQuestions(){
+  S.step='loading';S.error=null;render();
+  const role=ROLES.find(r=>r.id===S.role)?.label||S.role;
+  const dev=DEVS.find(d=>d.id===S.device)?.label||S.device;
+  const prompt=`You are a cybersecurity expert. Generate a personalised cybersecurity risk assessment for a ${role} who primarily uses ${dev}.\n\nCreate exactly 5 categories, each with exactly 3 multiple-choice questions specific to their role and device.\n\nReturn ONLY valid JSON:\n{"categories":[{"id":"string","label":"string","icon":"emoji","questions":[{"q":"string","opts":[{"text":"string","risk":0},{"text":"string","risk":25},{"text":"string","risk":60},{"text":"string","risk":100}]}]}]}\n\nRisk: 0=best practice, 25=acceptable, 60=risky, 100=critical. Cover: authentication, device security, network habits, threat awareness, data protection. Pure JSON only.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})});
+    if(!r.ok)throw new Error(`API ${r.status}`);
+    const d=await r.json();
+    const txt=d.content?.find(b=>b.type==='text')?.text||'';
+    const parsed=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    if(!parsed.categories)throw new Error('Invalid response');
+    S.cats=parsed.categories;S.step='quiz';S.ci=0;S.qi=0;S.ans={};
+  }catch(e){S.error=e.message;S.step='profile';}
+  render();
+}
+
+async function genReport(){
+  S.step='generating';render();
+  const{cs,overall}=scores();
+  const level=getRisk(overall);
+  const role=ROLES.find(r=>r.id===S.role)?.label||S.role;
+  const dev=DEVS.find(d=>d.id===S.device)?.label||S.device;
+  const detail=S.cats.map(c=>{
+    const a=S.ans[c.id]||[];
+    const avg=a.length?Math.round(a.reduce((s,v)=>s+v,0)/a.length):50;
+    const qs=c.questions.map((q,i)=>{const o=q.opts.find(x=>x.risk===a[i]);return`Q: ${q.q}\nA: ${o?o.text:'unanswered'} (risk:${a[i]??50})`;}).join('\n');
+    return`${c.label} (score:${avg}/100)\n${qs}`;
+  }).join('\n\n');
+  const prompt=`Cybersecurity expert. A ${role} on ${dev} scored ${overall}/100 (${level.label}).\n\nResponses:\n${detail}\n\nReturn ONLY JSON:\n{"summary":"2-3 sentence personalised summary","recommendations":[{"title":"string","desc":"specific 1-2 sentence advice","severity":"high|medium|low","icon":"emoji"}]}\n\n3-6 recommendations by severity. Be specific to role and device. Pure JSON only.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    if(!r.ok)throw new Error(`API ${r.status}`);
+    const d=await r.json();
+    const txt=d.content?.find(b=>b.type==='text')?.text||'';
+    S.report=JSON.parse(txt.replace(/```json|```/g,'').trim());
+  }catch(e){S.report={summary:'Assessment complete. Review the breakdown below to prioritise your improvements.',recommendations:[]};}
+  S.step='report';render();
+}
+
+function render(){
+  const app=document.getElementById('app');
+  if(S.step==='intro')app.innerHTML=rIntro();
+  else if(S.step==='profile')app.innerHTML=rProfile();
+  else if(S.step==='loading')app.innerHTML=rLoad('Generating your personalised questions...','Building your assessment');
+  else if(S.step==='generating')app.innerHTML=rLoad('Analysing your responses...','Creating risk report');
+  else if(S.step==='quiz')app.innerHTML=rQuiz();
+  else app.innerHTML=rReport();
+  attachEvents();
+}
+
+function rIntro(){return`<div class="ai-b">✦ AI-powered</div><div class="lbl">Cybersecurity Assessment</div><div class="title">Your Personal Risk Scanner</div><p class="sub">Claude generates 15 questions tailored to your specific role and devices — then produces a personalised risk report with targeted recommendations.</p><div style="background:var(--bg-s);border-radius:var(--rm);padding:14px 16px;margin-bottom:1.5rem;font-size:13px;color:var(--ts);line-height:1.7;"><span style="font-size:12px;font-family:'DM Mono',monospace;letter-spacing:.05em;color:var(--tp);font-weight:500;">HOW IT WORKS</span><br><br>1. Select your role and primary device<br>2. Claude generates 15 tailored questions<br>3. Get a scored report with AI recommendations</div><button class="btnp" id="startBtn" style="width:100%;padding:14px;">Get Started →</button><footer style="margin-top:1.25rem;">Powered by Claude API · No data stored</footer>`;}
+
+function rProfile(){return`<div class="pbar"><div class="pfill" style="width:10%"></div></div><div class="lbl">Profile Setup</div><div class="title" style="font-size:20px;margin-bottom:1rem;">Tell us about yourself</div>${S.error?`<div class="err">⚠ ${S.error}. Check your API key is configured and try again.</div>`:''}<p style="font-size:13px;color:var(--ts);margin-bottom:.6rem;">What best describes your role?</p><div class="pgrid">${ROLES.map(r=>`<button class="chip ${S.role===r.id?'sel':''}" data-role="${r.id}"><span class="chip-ic">${r.icon}</span><span class="chip-lb">${r.label}</span><span class="chip-sb">${r.sub}</span></button>`).join('')}</div><p style="font-size:13px;color:var(--ts);margin-bottom:.6rem;margin-top:1rem;">Primary device / platform?</p><div class="pgrid">${DEVS.map(d=>`<button class="chip ${S.device===d.id?'sel':''}" data-dev="${d.id}"><span class="chip-ic">${d.icon}</span><span class="chip-lb">${d.label}</span><span class="chip-sb">${d.sub}</span></button>`).join('')}</div><div class="nav" style="margin-top:1.5rem;"><button class="btns" id="backIntroBtn">← Back</button><button class="btnp" id="genBtn" ${!S.role||!S.device?'disabled':''}>Generate My Questions →</button></div>`;}
+
+function rLoad(sub,lbl){return`<div class="spin-wrap"><div class="spinner"></div><div class="spin-lbl">${lbl}</div><div class="spin-sub">${sub}</div></div>`;}
+
+function rQuiz(){
+  const cat=S.cats[S.ci];const q=cat.questions[S.qi];
+  const tot=totalQ();const done=doneQ();const pct=Math.round((done/tot)*100);
+  const cur=(S.ans[cat.id]||[])[S.qi];
+  const last=(S.ci===S.cats.length-1)&&(S.qi===cat.questions.length-1);
+  return`<div class="pbar"><div class="pfill" style="width:${pct}%"></div></div><div class="lbl">${cat.icon} ${cat.label}</div><div class="qctr">${done+1} / ${tot}</div><div class="qtxt">${q.q}</div>${q.opts.map((o,i)=>`<button class="opt ${cur===o.risk?'sel':''}" data-opt="${i}" data-risk="${o.risk}">${o.text}</button>`).join('')}<div class="nav">${done>0?`<button class="btns" id="backBtn">← Back</button>`:''}<button class="btnp" id="nextBtn" ${cur===undefined?'disabled':''}>${last?'See My Report →':'Next →'}</button></div>`;
+}
+
+function rReport(){
+  const{cs,overall}=scores();const level=getRisk(overall);
+  const recs=S.report?.recommendations||[];
+  const role=ROLES.find(r=>r.id===S.role)?.label||'';
+  const dev=DEVS.find(d=>d.id===S.device)?.label||'';
+  const cbars=S.cats.map(c=>{const s=cs[c.id];const l=getRisk(s);return`<div class="crow"><span class="cnm">${c.icon} ${c.label}</span><div class="ctrk"><div class="cfil" style="width:${s}%;background:${l.color}"></div></div><span class="csco">${s}</span></div>`;}).join('');
+  const ritems=recs.map(r=>{const sc=SEV[r.severity]||SEV.medium;return`<div class="rec"><div class="rec-ic" style="background:${sc.bg};color:${sc.color};">${r.icon}</div><div><div class="rec-t">${r.title}</div><div class="rec-d">${r.desc}</div></div></div>`;}).join('');
+  const circ=2*Math.PI*68;
+  return`<div style="margin-bottom:1rem;"><span class="tag" style="background:var(--bg-s);color:var(--ts);">${role}</span><span class="tag" style="background:var(--bg-s);color:var(--ts);">${dev}</span><span class="ai-b" style="margin-bottom:0;">✦ AI report</span></div><div class="ring-wrap"><div class="lbl" style="margin-bottom:.5rem;">Overall Risk Score</div><svg width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="68" fill="none" stroke="#e5e5e5" stroke-width="8"/><circle cx="80" cy="80" r="68" fill="none" stroke="${level.color}" stroke-width="8" stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${(circ*(1-overall/100)).toFixed(2)}" stroke-linecap="round" transform="rotate(-90 80 80)"/><text x="80" y="74" text-anchor="middle" font-family="'DM Mono',monospace" font-size="36" font-weight="500" fill="${level.color}">${overall}</text><text x="80" y="93" text-anchor="middle" font-family="'DM Mono',monospace" font-size="10" fill="#9a9a9a">RISK SCORE</text></svg><div class="badge" style="background:${level.bg};color:${level.tc};">${level.label}</div></div>${S.report?.summary?`<p style="font-size:14px;color:var(--ts);line-height:1.7;margin-bottom:.5rem;">${S.report.summary}</p>`:''}<div class="sh">Category Breakdown</div>${cbars}${ritems?`<div class="sh">Recommendations</div>${ritems}`:''}<div style="margin-top:1.5rem;"><button class="btns" id="restartBtn" style="width:100%;">Start Over</button></div><footer style="margin-top:1.25rem;">AI-generated · Results are indicative only · No data stored</footer>`;
+}
+
+function attachEvents(){
+  const g=id=>document.getElementById(id);
+  if(g('startBtn'))g('startBtn').onclick=()=>{S.step='profile';render();};
+  if(g('backIntroBtn'))g('backIntroBtn').onclick=()=>{S.step='intro';render();};
+  if(g('genBtn'))g('genBtn').onclick=()=>genQuestions();
+  if(g('restartBtn'))g('restartBtn').onclick=()=>{S={step:'intro',role:null,device:null,cats:[],ci:0,qi:0,ans:{},report:null,error:null};render();};
+  document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{S.role=b.dataset.role;render();});
+  document.querySelectorAll('[data-dev]').forEach(b=>b.onclick=()=>{S.device=b.dataset.dev;render();});
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const c=S.cats[S.ci];if(!S.ans[c.id])S.ans[c.id]=[];S.ans[c.id][S.qi]=parseInt(b.dataset.risk);render();});
+  const nx=g('nextBtn');
+  if(nx&&!nx.disabled)nx.onclick=()=>{const c=S.cats[S.ci];if(S.qi<c.questions.length-1){S.qi++;}else if(S.ci<S.cats.length-1){S.ci++;S.qi=0;}else{genReport();return;}render();};
+  const bk=g('backBtn');
+  if(bk)bk.onclick=()=>{if(S.qi>0){S.qi--;}else if(S.ci>0){S.ci--;S.qi=S.cats[S.ci].questions.length-1;}render();};
+}
+render();
+</script>
+</body>
+</html>
